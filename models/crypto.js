@@ -9,7 +9,6 @@ const CryptoSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
     },
     price: {
         type: String,
