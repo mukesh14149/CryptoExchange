@@ -20,6 +20,7 @@ const CryptoSchema = new mongoose.Schema({
 
 function validateCryptoDetails(cryptoData) {
     const schema = {
+        id: Joi.string(),
         cryptoSymbol: Joi.string()
             .required(),
         price: Joi.string()

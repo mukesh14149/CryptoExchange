@@ -5,6 +5,8 @@ const userApi = require('./Routes/UsersApi/index')
 const crytoApi = require('./Routes/CrytoApi/index')
 const auth = require('./middleware/auth')
 const config = require('config')
+const binance = require('./Service/binance')();
+
 mongoose.connect(config.get('db'), { useNewUrlParser: true, useCreateIndex: true }).then(() => {
     console.log("mongodb connected");
 })
