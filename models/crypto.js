@@ -1,20 +1,19 @@
 const mongoose = require('mongoose');
 const Joi = require('@hapi/joi');
-var jwt = require('jsonwebtoken');
 const CryptoSchema = new mongoose.Schema({
     cryptoSymbol: {
         type: String,
         required: true
-    },
-    email: {
-        type: String,
-        required: true,
     },
     price: {
         type: String,
         required: true,
         minlength: 1,
         maxlength: 25
+    },
+    email: {
+        type: String,
+        required: true,
     }
 });
 

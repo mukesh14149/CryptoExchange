@@ -3,60 +3,70 @@ const bcrypt = require('bcrypt');
 var uniqid = require('uniqid');
 const _ = require('lodash');
 const mailer = require('../../Service/sendEmail');
-const emailTemplate = require('../../template/emailTemplate');
+const emailTemplate = require('../../models/emailTemplate');
+const CustomError = require("../../models/CustomError");
+const Response = require("../../models/Response");
+
 const UserController = {};
 
 UserController.register = async (req, res) => {
     const { error } = validateUserAtSignup(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) throw new CustomError(400, error.details[0].message);
 
     let user = await User.findOne({ email: req.body.email });
-    if (user) return res.status(400).send("User already registered.");
+    if (user) throw new CustomError(400, "User already registered");
 
     user = new User(_.pick(req.body, ["name", "email", "password", "mobile"]));
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     user.uniqueHash = uniqid();
-    await user.save();
-
-    var emailOptions = Object.assign({}, emailTemplate.Default);
-    emailOptions.to = req.body.email;
-    emailOptions.text = "http://localhost:3000/users/confirmemail?id="+ user.uniqueHash;
-    mailer.sendmail(emailOptions);
-    
-    res.send("Email verification link has been sent to your email id");
+    let result = await user.save();
+    if(result){
+        var emailOptions = Object.assign({}, emailTemplate.Default);
+        emailOptions.to = req.body.email;
+        emailOptions.text = "http://localhost:3000/users/confirmemail?id=" + user.uniqueHash;
+        mailer.sendmail(emailOptions);
+        res.status(200).send(new Response(200, {
+            message: "Email verification link has been sent to your Email id",
+            data: _.pick(user, ["_id", "name", "email", "mobile"])
+        }, null));
+    }
 };
 
 
 UserController.login = async (req, res) => {
-
     const { error } = validateUserAtLogin(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) throw new CustomError(400, error.details[0].message);
 
     let user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(400).send('Invalid email or password.');
+    if (!user) throw new CustomError(400, "Invalid email or password");
 
     const validPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPassword) return res.status(400).send('Invalid email or password.');
+    if (!validPassword) throw new CustomError(400, "Invalid email or password");
 
     if(!user.verified){
         var emailOptions = Object.assign({}, emailTemplate.Default);
         emailOptions.to = req.body.email;
         emailOptions.text = "http://localhost:3000/users/confirmemail?id=" + user.uniqueHash;
         mailer.sendmail(emailOptions);
-        return res.send("Email not verified, Please check your email to verify");
+        throw new CustomError(403, "Email not verified, Please check your email to verify");
     }
     const token = user.generateAuthToken();
-    res.send(token);    
+    res.status(200).send(new Response(200, {
+        message: "Login Successfully",
+        data: {token: token}
+    }, null));  
 };
 
 
 UserController.confirmEmail = async (req, res) => {
     let user = await User.findOne({ uniqueHash: req.query.id });
-    if (!user) return res.status(400).send('Invalid Id');
-
+    if (!user) throw new CustomError(400, "Invalid Id");
     user.verified = true;
     await user.save();
-    res.send("Success");
+    res.status(200).send(new Response(200, {
+        message: "Email Verify Successfully",
+        data: null
+    }, null));  
 };
 module.exports = UserController;
