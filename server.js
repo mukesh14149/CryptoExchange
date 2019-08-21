@@ -23,20 +23,21 @@ app.use("/users", userApi);
 app.use("/crypto", auth, crytoApi);
 
 
-// let startTime = new Date(Date.now());
-// var j = schedule.scheduleJob({ start: startTime, rule: '*/5 * * * * *' }, function () {
-//     console.log('Example');
+
+// // let startTime = new Date(Date.now());
+// // var j = schedule.scheduleJob({ start: startTime, rule: '*/5 * * * * *' }, function () {
+// //     console.log('Example');
+// // });
+// rl = readline('mynewfile1.txt');
+// rl.on('line', function (line, lineCount, byteCount) {
+//     // do something with the line of text
+//     console.log(line);
+//    // output.write(line + '\n');
+// })
+// .on('error', function (e) {
+//     // something went wrong
+//     console.log(e);
 // });
-rl = readline('mynewfile1.txt');
-rl.on('line', function (line, lineCount, byteCount) {
-    // do something with the line of text
-    console.log(line);
-   // output.write(line + '\n');
-})
-.on('error', function (e) {
-    // something went wrong
-    console.log(e);
-});
 
 
 app.listen(3000, ()=> {console.log("Starting server")});

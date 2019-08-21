@@ -14,6 +14,16 @@ const CryptoSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+    },
+    priceType: {
+        type: Boolean, // true -> gte and false -> lte
+        required: true
+    },
+    isPriceHit:{
+        type:Boolean
+    },
+    priceHitTime:{
+        type:Date
     }
 });
 
@@ -26,6 +36,8 @@ function validateCryptoDetails(cryptoData) {
             .min(5)
             .max(15)
             .required(),
+        priceType: Joi.boolean()
+            .required()
     };
     return Joi.validate(cryptoData, schema);
 }
