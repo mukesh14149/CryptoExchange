@@ -6,9 +6,9 @@ const mailer = require('../../Service/sendEmail');
 const emailTemplate = require('../../models/emailTemplate');
 const CustomError = require("../../models/CustomError");
 const Response = require("../../models/Response");
-
 const UserController = {};
 
+// User Registration
 UserController.register = async (req, res) => {
     const { error } = validateUserAtSignup(req.body);
     if (error) throw new CustomError(400, error.details[0].message);
@@ -33,7 +33,7 @@ UserController.register = async (req, res) => {
     }
 };
 
-
+//User login
 UserController.login = async (req, res) => {
     const { error } = validateUserAtLogin(req.body);
     if (error) throw new CustomError(400, error.details[0].message);
@@ -58,7 +58,7 @@ UserController.login = async (req, res) => {
     }, null));  
 };
 
-
+// When user confirmemail
 UserController.confirmEmail = async (req, res) => {
     let user = await User.findOne({ uniqueHash: req.query.id });
     if (!user) throw new CustomError(400, "Invalid Id");

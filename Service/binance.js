@@ -1,7 +1,7 @@
 const { Crypto, validateCryptoDetails } = require('../models/crypto');
-var fs = require('fs');
-var os = require("os");
 let usersCrypto;
+
+/* Whenever price matches with set task price it will updata db with pricehit time */
 updateTask = async function(price, type){
     let crypto = await Crypto.findOne({
         price: price,
@@ -15,6 +15,8 @@ updateTask = async function(price, type){
 module.exports = function(){
     var WebSocket = require('ws');
     var ws = new WebSocket('wss://stream.binance.com:9443/ws/!ticker@arr');
+
+    /* Fetch all crypto data from db */
     Crypto.find({}).then((data)=> {
         usersCrypto = data;
     })
@@ -23,11 +25,14 @@ module.exports = function(){
         console.log("Connected to Binance");
     });
     ws.on('message', function (data) {
-        simpleData = {};
+        /* price comparision */
+        simpleData = {}; // map which contain symbol-price relation
         let result = JSON.parse(data);
         for(let i=0;i<result.length;i++){
             simpleData[result[i]['s']] = result[i]['c'];
         }
+
+        // Go over all crypto and check for price
         for(let i=0;i<usersCrypto.length;i++){            
             if(usersCrypto[i].priceType){
                 if(simpleData[usersCrypto[i].cryptoSymbol] >= usersCrypto[i].price){
@@ -39,6 +44,8 @@ module.exports = function(){
                 }
             }
         }
+
+        //Keep check for db for newly added task
         Crypto.find({}).then((data)=> {
             usersCrypto = data;
         })

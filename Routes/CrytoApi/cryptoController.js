@@ -2,8 +2,10 @@ const { Crypto, validateCryptoDetails } = require('../../models/crypto');
 const _ = require('lodash');
 const CustomError = require("../../models/CustomError");
 const Response = require("../../models/Response");
+var request = require('request');
 const CryptoController = {};
 
+// Create a task
 CryptoController.set = async (req, res) => {
     const { error } = validateCryptoDetails(req.body);
     if (error) throw new CustomError(400, error.details[0].message);
@@ -17,7 +19,7 @@ CryptoController.set = async (req, res) => {
         throw new CustomError(400, 'Notification for this symbol for this price is already set');
 
     crypto = new Crypto(_.assign({},
-         _.pick(req.body, ["cryptoSymbol", "price"]), 
+        _.pick(req.body, ["cryptoSymbol", "price", "priceType"]), 
          { email: req.user.email}
     ));
     await crypto.save();
@@ -27,14 +29,7 @@ CryptoController.set = async (req, res) => {
     }, null));
 };
 
-CryptoController.getcryptolist = async (req, res) => {
-    let crypto = await Crypto.find({email: req.user.email});
-    res.status(200).send(new Response(200, {
-        message: "Success",
-        data: crypto
-    }, null));
-};
-
+// Update a task
 CryptoController.update = async (req, res) => {
     if (!req.body.id) throw new CustomError(400, 'Please provide id of a task to update');
 
@@ -57,7 +52,7 @@ CryptoController.update = async (req, res) => {
     }, null));
 };
 
-
+// Delete a task
 CryptoController.delete = async (req, res) => {
     if (!req.body.id) throw new CustomError(400, 'Please provide id of a task to delete');
 
@@ -72,6 +67,24 @@ CryptoController.delete = async (req, res) => {
     }, null));
 };
 
+// Get all symbol list from binance
+CryptoController.getallcryptosymbol = async (req, res) => {
+    request(' https://api.binance.com/api/v3/ticker/price', function (error, response, body) {
+        if (error) throw new CustomError(400, 'Problem occur in fetching data');
+        res.status(response.statusCode).send(new Response(response.statusCode, {
+            message: "Success",
+            data: JSON.parse(body)
+        }, null));
+    });
+};
 
+// Get all task set by user
+CryptoController.getcryptolist = async (req, res) => {
+    let crypto = await Crypto.find({ email: req.user.email });
+    res.status(200).send(new Response(200, {
+        message: "Success",
+        data: crypto
+    }, null));
+};
 
 module.exports = CryptoController;
