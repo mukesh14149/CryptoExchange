@@ -60,7 +60,7 @@ CryptoController.delete = async (req, res) => {
         _id: req.body.id,
         email: req.user.email    
     });
-    if (!crypto) throw new CustomError(400, 'No crypto has been found for this id');    
+    if (crypto.deletedCount == 0) throw new CustomError(400, 'No crypto has been found for this id');    
     res.status(200).send(new Response(200, {
         message: "Successfully deleted task",
         data: null

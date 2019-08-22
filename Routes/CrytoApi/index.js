@@ -6,7 +6,7 @@ const CryptoController = require("./cryptoController");
 router.post("/set", handleRequest(CryptoController.set));
 router.get("/getallcryptosymbol", handleRequest(CryptoController.getallcryptosymbol));
 router.get("/getcryptolist", handleRequest(CryptoController.getcryptolist));
-router.post("/delete", handleRequest(CryptoController.delete));
-router.post("/update", handleRequest(CryptoController.update));
+router.delete("/delete", handleRequest(CryptoController.delete));
+router.put("/update", handleRequest(CryptoController.update));
 
 module.exports = router;
