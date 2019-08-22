@@ -1,3 +1,4 @@
+## Follow these to Run
 1. npm install 
 
 2. Set environment variable for email and pass for sending email
@@ -7,7 +8,7 @@ export cryptoEmailPassword='yourpassword'
 
 3. npm start
 
-##Modules
+## Modules
 1. User Api contains:-
    Login -> user login through this api
    Register -> user register through this api
@@ -21,7 +22,7 @@ export cryptoEmailPassword='yourpassword'
    getallcryptosymbol -> get all cryptocurrency symbol name and its current price
    getcryptolist -> get list of all reminders he set
 
-##Services
+## Services
 1. binance- 
 	Used to create wss connection to binance server to get price list for all symbol when it update and then from given data check for price match if the crypto price hit the set price then update the db with the pricehit time and on ther other side scheduler will send the email.
 
