@@ -5,10 +5,12 @@ const userApi = require('./Routes/UsersApi/index')
 const crytoApi = require('./Routes/CrytoApi/index')
 const auth = require('./middleware/auth')
 const config = require('config')
+var redis = require('redis');
+client = redis.createClient();
 
 /* web socket connection to fetch realtime price for all symbols */
-require('./Service/binance')();
-
+const { binanceApi} = require('./Service/binance')
+binanceApi();
 /* Scheduler to send email to user for all task whos price just hit. */
 require('./Service/scheduler')(); 
 
@@ -27,6 +29,5 @@ app.use("/users", userApi);
 
 /* Contain crypto related routes*/
 app.use("/crypto", auth, crytoApi);
-
 
 app.listen(3000, ()=> {console.log("Starting server")});
